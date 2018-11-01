@@ -25,22 +25,24 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class googleActivity extends AppCompatActivity implements OnMapReadyCallback {
 
 
-    private static final String TAG = "MapActivity";
+    private static final String TAG = "GoogleActivity";
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
     private static final float DEFAULT_ZOOM = 15f;
-    private static final int ProximityRadius = 100000;
+    private static final int ProximityRadius = 10000;
 
     //vars
-    private GoogleApiClient googleApiClient;
     private Boolean mLocationPermissionsGranted = false;
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
-    private double latitude,longitude;
+    public double latitude,longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,19 +65,7 @@ public class googleActivity extends AppCompatActivity implements OnMapReadyCallb
 
             }
             mMap.setMyLocationEnabled(true);
-            // restaurants ophalen
 
-            GetNearbyPlaces getNearbyPlaces = new GetNearbyPlaces();
-
-            mMap.clear();
-            Object transferData[] = new Object[2];
-            String url = getUrl(latitude, longitude, "restaurant");
-            transferData[0] = mMap;
-            transferData[1] = url;
-
-            getNearbyPlaces.execute(transferData);
-            Toast.makeText(this, "Searching for Nearby Restaurants...", Toast.LENGTH_SHORT).show();
-            Toast.makeText(this, "Showing Nearby Restaurants...", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -94,6 +84,25 @@ public class googleActivity extends AppCompatActivity implements OnMapReadyCallb
                             latitude = currentLocation.getLatitude();
                             longitude = currentLocation.getLongitude();
                             moveCamera(new LatLng(latitude,longitude ), DEFAULT_ZOOM);
+                            // restaurants ophalen
+
+                            GetNearbyPlaces getNearbyPlaces = new GetNearbyPlaces();
+
+                            mMap.clear();
+                            Object transferData[] = new Object[2];
+
+                            String url = getUrl(latitude, longitude, "restaurant");
+                            transferData[0] = mMap;
+                            transferData[1] = url;
+
+                            getNearbyPlaces.execute(transferData);
+                            mMap.setMyLocationEnabled(true);
+                            Bundle extras = getIntent().getExtras();
+                            if(extras != null){
+                                float lat = extras.getFloat("latitude");
+                                float lon = extras.getFloat("longitude");
+                                moveCamera(new LatLng(lat,lon),DEFAULT_ZOOM);
+                            }
 
                         } else {
                             Log.d(TAG, "location not found!");

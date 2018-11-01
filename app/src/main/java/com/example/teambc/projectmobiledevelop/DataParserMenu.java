@@ -9,48 +9,21 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class DataParser
+public class DataParserMenu
 {
     private HashMap<String, String> getSingleNearbyPlace(JSONObject googlePlaceJSON)
     {
         HashMap<String, String> googlePlaceMap = new HashMap<>();
-        String NameOfPlace = "-NA-";
-        String vicinity = "-NA-";
-        String latitude = "";
-        String longitude = "";
-        String reference = "";
-        int rating = 0;
-        String open ="";
+
+        String place_id = "";
+
 
         try
         {
-            if (!googlePlaceJSON.isNull("name"))
-            {
-                NameOfPlace = googlePlaceJSON.getString("name");
-            }
-            if (!googlePlaceJSON.isNull("vicinity"))
-            {
-                vicinity = googlePlaceJSON.getString("vicinity");
-            }
-            if (!googlePlaceJSON.isNull("rating"))
-            {
-                rating = googlePlaceJSON.getInt("rating");
-            }
-            if (!googlePlaceJSON.isNull("opening_hours"))
-            {
-                open = googlePlaceJSON.getJSONObject("opening_hours").getString("open_now");
-            }
-            latitude = googlePlaceJSON.getJSONObject("geometry").getJSONObject("location").getString("lat");
-            longitude = googlePlaceJSON.getJSONObject("geometry").getJSONObject("location").getString("lng");
-            reference = googlePlaceJSON.getString("reference");
 
-            googlePlaceMap.put("open",open);
-            googlePlaceMap.put("rating",Integer.toString(rating));
-            googlePlaceMap.put("place_name", NameOfPlace);
-            googlePlaceMap.put("vicinity", vicinity);
-            googlePlaceMap.put("lat", latitude);
-            googlePlaceMap.put("lng", longitude);
-            googlePlaceMap.put("reference", reference);
+                place_id = googlePlaceJSON.getString("place_id");
+
+            googlePlaceMap.put("place_id", place_id);
         }
         catch (JSONException e)
         {

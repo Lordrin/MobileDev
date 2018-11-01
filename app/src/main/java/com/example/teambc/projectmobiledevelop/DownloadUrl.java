@@ -24,6 +24,13 @@ public class DownloadUrl
         {
             URL url = new URL(placeURL);
             httpURLConnection = (HttpURLConnection) url.openConnection();
+            httpURLConnection.setReadTimeout(1500 /* milliseconds */);
+            httpURLConnection.setConnectTimeout(1500 /* milliseconds */);
+            httpURLConnection.setRequestMethod("GET"); // Or any method you need
+            httpURLConnection.setDoInput(true);
+
+            // Starts the query
+
             httpURLConnection.connect();
 
             inputStream = httpURLConnection.getInputStream();
