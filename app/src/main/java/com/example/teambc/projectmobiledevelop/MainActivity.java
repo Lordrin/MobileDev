@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final int ProximityRadius = 10000;
 
+    public int counterOpen = 0;
     private Boolean mLocationPermissionsGranted = false;
     public String sortby = "distance";
     ScrollView mScrollView;
@@ -66,17 +67,23 @@ public class MainActivity extends AppCompatActivity {
     Button mapsButton;
     private String plaats;
     private static final int ERROR_DIALOG_REQUEST = 9001;
-    public int I;
-    public int calledFrom;
     public String[] dummyNames = new String[20];
+    public String[] dummyNamesOpen = new String[20];
     public String[] websites = new String[20];
-    public Button[] websiteButtons = new Button[20];
+    public String[] websitesOpen = new String[20];
     public float[] latitudeArray = new float[20];
+    public float[] latitudeArrayOpen = new float[20];
     public float[] longitudeArray = new float[20];
+    public float[] longitudeArrayOpen = new float[20];
     public double[] distanceArray = new double[20];
+    public double[] distanceArrayOpen = new double[20];
     public double[] ratingArray = new double[20];
-    private RestaurantInfo restaurantInfo = new RestaurantInfo();
+    public double[] ratingArrayOpen = new double[20];
+    public boolean[] openArray = new boolean[20];
+    private String[] phoneNumber = new String [20];
+    private String[] address = new String [20];
 
+    private RestaurantInfo restaurantInfo = new RestaurantInfo();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +101,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         }
-
         configureerButtons();
         if (isServicesOK()) {
             init();
@@ -151,7 +157,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, googleActivity.class);
-                calledFrom = 21;
                 startActivity(intent);
             }
         });
@@ -173,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("MainActivity", "isServicesOK : checking google services version");
         int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainActivity.this);
         if (available == ConnectionResult.SUCCESS) {
-            Log.d("MainActivity", "isServicesOK()) : Google play services si working");
+            Log.d("MainActivity", "isServicesOK()) : Google play services is working");
             return true;
         } else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)) {
             //een error is gebeurt maar we kunnen het fixen
@@ -186,61 +191,86 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    public void sortArrayByRating() {
+    private void rearrangeArrays(int j){
         double temp;
+        double tempD;
         String tempNames;
         String tempWebsite;
+        String tempAdres;
         float tempLatitude;
         float tempLongitude;
+
+        tempD = distanceArray[j];
+        distanceArray[j] = distanceArray[j - 1];
+        distanceArray[j - 1] = tempD;
+        temp = ratingArray[j];
+        ratingArray[j] = ratingArray[j - 1];
+        ratingArray[j - 1] = temp;
+        tempNames = dummyNames[j];
+        dummyNames[j] = dummyNames[j - 1];
+        dummyNames[j - 1] = tempNames;
+        tempWebsite = websites[j];
+        websites[j] = websites[j - 1];
+        websites[j - 1] = tempWebsite;
+        tempLatitude = latitudeArray[j];
+        latitudeArray[j] = latitudeArray[j - 1];
+        latitudeArray[j - 1] = tempLatitude;
+        tempLongitude = longitudeArray[j];
+        longitudeArray[j] = longitudeArray[j - 1];
+        longitudeArray[j - 1] = tempLongitude;
+        tempAdres = address[j];
+        address[j] = address[j - 1];
+        address[j-1] = tempAdres;
+        String tempPhoneN = phoneNumber[j];
+        phoneNumber[j] = phoneNumber[j-1];
+        phoneNumber[j-1]= tempPhoneN;
+    }
+
+    public void sortArrayByRating() {
+        restaurantInfo.clearRestaurants();
         for (int i = 1; i < ratingArray.length; i++) {
             for (int j = i; j > 0; j--) {
-                if (ratingArray[j] < ratingArray[j - 1]) {
-                    temp = ratingArray[j];
-                    ratingArray[j] = ratingArray[j - 1];
-                    ratingArray[j - 1] = temp;
-                    tempNames = dummyNames[j];
-                    dummyNames[j] = dummyNames[j - 1];
-                    dummyNames[j - 1] = tempNames;
-                    tempWebsite = websites[j];
-                    websites[j] = websites[j - 1];
-                    websites[j - 1] = tempWebsite;
-                    tempLatitude = latitudeArray[j];
-                    latitudeArray[j] = latitudeArray[j - 1];
-                    latitudeArray[j - 1] = tempLatitude;
-                    tempLongitude = longitudeArray[j];
-                    longitudeArray[j] = longitudeArray[j - 1];
-                    longitudeArray[j - 1] = tempLongitude;
+                if (ratingArray[j] > ratingArray[j - 1]) {
+                    rearrangeArrays(j);
                 }
             }
         }
     }
 
     public void sortArrayByDistance() {
-        double temp;
-        String tempNames;
-        String tempWebsite;
-        float tempLatitude;
-        float tempLongitude;
+        restaurantInfo.clearRestaurants();
         for (int i = 1; i < distanceArray.length; i++) {
             for (int j = i; j > 0; j--) {
                 if (distanceArray[j] < distanceArray[j - 1]) {
-                    temp = distanceArray[j];
-                    distanceArray[j] = distanceArray[j - 1];
-                    distanceArray[j - 1] = temp;
-                    tempNames = dummyNames[j];
-                    dummyNames[j] = dummyNames[j - 1];
-                    dummyNames[j - 1] = tempNames;
-                    tempWebsite = websites[j];
-                    websites[j] = websites[j - 1];
-                    websites[j - 1] = tempWebsite;
-                    tempLatitude = latitudeArray[j];
-                    latitudeArray[j] = latitudeArray[j - 1];
-                    latitudeArray[j - 1] = tempLatitude;
-                    tempLongitude = longitudeArray[j];
-                    longitudeArray[j] = longitudeArray[j - 1];
-                    longitudeArray[j - 1] = tempLongitude;
+                    rearrangeArrays(j);
                 }
             }
+        }
+    }
+
+    public void sortArrayByOpening() {
+        counterOpen = 0;
+        restaurantInfo.clearRestaurants();
+        for (int i = 0; i < openArray.length; i++) {
+            if (openArray[i] == true) {
+                dummyNamesOpen[counterOpen] = dummyNames[i];
+                websitesOpen[counterOpen] = websites[i];
+                distanceArrayOpen[counterOpen] = distanceArray[i];
+                latitudeArrayOpen[counterOpen] = latitudeArray[i];
+                longitudeArrayOpen[counterOpen] = longitudeArray[i];
+                RestaurantInfo.Restaurant rest = restaurantInfo.new Restaurant(dummyNamesOpen[counterOpen], phoneNumber[i], Double.toString(ratingArray[i]),
+                        address[i], websitesOpen[counterOpen], latitudeArrayOpen[counterOpen], longitudeArrayOpen[counterOpen]);
+                restaurantInfo.addRestaurants(rest);
+                counterOpen++;
+            }
+        }
+    }
+
+    private void restaurantAdder(){
+        for(int i = 0; i < 20; i++) {
+            RestaurantInfo.Restaurant rest = restaurantInfo.new Restaurant(dummyNames[i], phoneNumber[i], Double.toString(ratingArray[i]),
+                    address[i], websites[i], latitudeArray[i], longitudeArray[i]);
+            restaurantInfo.addRestaurants(rest);
         }
     }
 
@@ -263,7 +293,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void initLayout() {
-
         for (int i = 0; i < 20; i++) {
             HashMap<String, String> restaurant = detailsArray.get(i);
             dummyNames[i] = restaurant.get("place_name");
@@ -272,100 +301,194 @@ public class MainActivity extends AppCompatActivity {
             longitudeArray[i] = Float.parseFloat(restaurant.get("longitude"));
             distanceArray[i] = distance(latitude, latitudeArray[i], longitude, longitudeArray[i]);
             ratingArray[i] = Double.parseDouble(restaurant.get("rating"));
-            RestaurantInfo.Restaurant rest = restaurantInfo.new Restaurant(dummyNames[i], "number", Double.toString(ratingArray[i]),
-                    "adress", websites[i], latitudeArray[i], longitudeArray[i]);
-            restaurantInfo.addRestaurants(rest);
+            phoneNumber[i] = restaurant.get("gsm_nummer");
+            address[i] = restaurant.get("vicinity");
+            if (restaurant.get("open") == "true") {
+                openArray[i] = true;
+            } else {
+                openArray[i] = false;
+            }
         }
-        makeRecycleViewer();
         //sort
         switch (sortby) {
             case "rating": {
                 sortArrayByRating();
+                restaurantAdder();
                 break;
             }
             case "distance": {
                 sortArrayByDistance();
+                restaurantAdder();
+                break;
+            }
+            case "opening": {
+                sortArrayByOpening();
                 break;
             }
         }
 
-        /*for(int i = 0; i < dummyNames.length;i++){
-            LinearLayout linear = new LinearLayout(this);
-            LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
-            linearLayoutParams.weight = 100;
-            linear.setOrientation(LinearLayout.HORIZONTAL);
-            linear.setPadding(10,0,0,10);
-            linear.setLayoutParams(linearLayoutParams);
-            TextView restName = new TextView(this);
+        makeRecycleViewer();
+      //  mInsideLinear.removeAllViews();
+        if (sortby.equals("opening")) {
+            for (int i = 0; i < counterOpen; i++) {
+                LinearLayout linear = new LinearLayout(this);
+                LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                linearLayoutParams.weight = 100;
+                linear.setOrientation(LinearLayout.HORIZONTAL);
+                linear.setPadding(10, 0, 0, 10);
+                linear.setLayoutParams(linearLayoutParams);
+                TextView restName = new TextView(this);
 
 
-
-            LinearLayout.LayoutParams textViewParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT, 20f);
-            restName.setLayoutParams(textViewParams);
-            if(dummyNames[i].length() > 20){
-                String[] split = dummyNames[i].split(" ");
-                String text = "";
-                Boolean check = true;
-                for(int j = 0;j < split.length;j++){
-                    if(j == split.length -1){
-                        text+= split[j];
-                    }else{
-                        if((split[j] + " " + split[j+1]).length() >= 20 ){
-                            text += split[j] + "\n" + split[j+1];
-                            j++;
-                        }else{
-                            text += split[j] + " " ;
+                LinearLayout.LayoutParams textViewParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 20f);
+                restName.setLayoutParams(textViewParams);
+                if (dummyNamesOpen[i].length() > 20) {
+                    String[] split = dummyNamesOpen[i].split(" ");
+                    String text = "";
+                    Boolean check = true;
+                    for (int j = 0; j < split.length; j++) {
+                        if (j == split.length - 1) {
+                            text += split[j];
+                        } else {
+                            if ((split[j] + " " + split[j + 1]).length() >= 20) {
+                                text += split[j] + "\n" + split[j + 1];
+                                j++;
+                            } else {
+                                text += split[j] + " ";
+                            }
                         }
                     }
+                    restName.setText(text);
+                } else {
+                    restName.setText(dummyNamesOpen[i]);
                 }
-                restName.setText(text);
-            }else{
-                restName.setText(dummyNames[i]);
+                restName.setTextSize(18);
+                restName.setMaxLines(2);
+                restName.setEllipsize(TextUtils.TruncateAt.END);
+
+
+                Button infoButton = new Button(this);
+                addButton(infoButton, i, "info");
+
+
+                final Button locatieButton = new Button(this);
+                addButton(locatieButton, i, "locatie");
+
+                final Button websiteButton = new Button(this);
+                addButton(websiteButton, i, "website");
+                websiteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int i = websiteButton.getId();
+                        browser(v, websitesOpen[i]);
+                    }
+                });
+                locatieButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int j = locatieButton.getId();
+                        Intent intent = new Intent(MainActivity.this, googleActivity.class);
+                        intent.putExtra("latitude", latitudeArrayOpen[j]);
+                        intent.putExtra("longitude", longitudeArrayOpen[j]);
+                        startActivity(intent);
+                    }
+                });
+                infoButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(MainActivity.this, "InfoButton" + (v.getId() + 1) + " is clicked", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                linear.addView(restName);
+                linear.addView(infoButton);
+                linear.addView(locatieButton);
+                linear.addView(websiteButton);
+
+         //       mInsideLinear.addView(linear);
             }
-            restName.setTextSize(18);
+        } else {
+            for (int i = 0; i < 20; i++) {
+                LinearLayout linear = new LinearLayout(this);
+                LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                linearLayoutParams.weight = 100;
+                linear.setOrientation(LinearLayout.HORIZONTAL);
+                linear.setPadding(10, 0, 0, 10);
+                linear.setLayoutParams(linearLayoutParams);
+                TextView restName = new TextView(this);
 
 
-            Button infoButton = new Button(this);
-            addButton(infoButton, i, "info");
-
-
-            final Button locatieButton = new Button(this);
-            addButton(locatieButton, i, "locatie");
-
-            final Button websiteButton = new Button(this);
-           addButton(websiteButton, i, "website");
-            websiteButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int i = websiteButton.getId();
-                   browser(v , websites[i]);
+                LinearLayout.LayoutParams textViewParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 20f);
+                restName.setLayoutParams(textViewParams);
+                if (dummyNames[i].length() > 20) {
+                    String[] split = dummyNames[i].split(" ");
+                    String text = "";
+                    Boolean check = true;
+                    for (int j = 0; j < split.length; j++) {
+                        if (j == split.length - 1) {
+                            text += split[j];
+                        } else {
+                            if ((split[j] + " " + split[j + 1]).length() >= 20) {
+                                text += split[j] + "\n" + split[j + 1];
+                                j++;
+                            } else {
+                                text += split[j] + " ";
+                            }
+                        }
+                    }
+                    restName.setText(text);
+                } else {
+                    restName.setText(dummyNames[i]);
                 }
-            });
-            locatieButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                   int j = locatieButton.getId();
-                    Intent intent = new Intent(MainActivity.this,googleActivity.class);
-                    intent.putExtra("latitude",latitudeArray[j]);
-                    intent.putExtra("longitude", longitudeArray[j]);
-                    startActivity(intent);
-                }
-            });
-            infoButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(MainActivity.this, "InfoButton" + (v.getId()+1) + " is clicked",Toast.LENGTH_SHORT).show();
-                }
-            });
+                restName.setTextSize(18);
+                restName.setMaxLines(2);
+                restName.setEllipsize(TextUtils.TruncateAt.END);
 
-            linear.addView(restName);
-            linear.addView(infoButton);
-            linear.addView(locatieButton);
-            linear.addView(websiteButton);
-            mInsideLinear.addView(linear);
 
-        }*/
+                Button infoButton = new Button(this);
+                addButton(infoButton, i, "info");
+
+
+                final Button locatieButton = new Button(this);
+                addButton(locatieButton, i, "locatie");
+
+                final Button websiteButton = new Button(this);
+                addButton(websiteButton, i, "website");
+                websiteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int i = websiteButton.getId();
+                        browser(v, websites[i]);
+                    }
+                });
+                locatieButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int j = locatieButton.getId();
+                        Intent intent = new Intent(MainActivity.this, googleActivity.class);
+                        intent.putExtra("latitude", latitudeArray[j]);
+                        intent.putExtra("longitude", longitudeArray[j]);
+                        startActivity(intent);
+                    }
+                });
+                infoButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(MainActivity.this, "InfoButton" + (v.getId() + 1) + " is clicked", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                linear.addView(restName);
+                linear.addView(infoButton);
+                linear.addView(locatieButton);
+                linear.addView(websiteButton);
+
+           //     mInsideLinear.addView(linear);
+
+            }
+        }
     }
+
 
     private void addButton(Button button, int number, String text) {
         LinearLayout.LayoutParams infoLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 25.0f);
@@ -384,7 +507,6 @@ public class MainActivity extends AppCompatActivity {
 
         GetNearbyPlacesMenu getNearbyPlacesMenu = new GetNearbyPlacesMenu();
 
-
         Object transferData[] = new Object[2];
 
         String url = getUrl(latitude, longitude, "restaurant");
@@ -394,21 +516,9 @@ public class MainActivity extends AppCompatActivity {
         String get = getNearbyPlacesMenu.execute(transferData).get();
 
         detailsArray = getNearbyPlacesMenu.getDetailsArray();
-
-
         initLayout();
     }
 
-    public List<Float> checkWhichLocationIsCalled() {
-        List<Float> tempList = new ArrayList<>();
-        if (!(calledFrom == 21)) {
-            tempList.add(latitudeArray[calledFrom]);
-            tempList.add(longitudeArray[calledFrom]);
-        } else {
-            tempList.add(1.1f);
-        }
-        return tempList;
-    }
 
     public void browser(View view, String url) {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -457,7 +567,6 @@ public class MainActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(), FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             if (ContextCompat.checkSelfPermission(this.getApplicationContext(), COURSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 mLocationPermissionsGranted = true;
-
             } else {
                 ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
             }
@@ -514,7 +623,6 @@ public class MainActivity extends AppCompatActivity {
 
         private final MainActivity mParentActivity;
         private final List<RestaurantInfo.Restaurant> mValues;
-        // private final boolean mTwoPane;
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
